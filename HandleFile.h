@@ -132,7 +132,7 @@ void ClassfiyAndCompeteSubsequence(int t,int idx,string &nows,char beginc,bool l
 		{
 			HandleCaseUnExpFail(x,d,fileUnexpFail);
 		}
-		else if (d >= x.length() - t)  /* 虽然没有满足结构 但仍人有足够的距离*/
+		else if (d >=  t)  /* 虽然没有满足结构 但仍人有足够的距离*/
 		{
 			HandleCaseUnExpSucc(x,d,fileUnexpSucc);
 		}
@@ -156,21 +156,26 @@ void ClassfiyAndCompeteSubsequence(int t,int idx,string &nows,char beginc,bool l
 		*/
 	    /* 下一段第一个符号和本段第一个一样： 根据本段长度，可以判断右边是否反转 再结合左边翻转情况就知道是不是满足结构要求*/
 		string ns = gen_next_string(nows,beginc,i);
-		ClassfiyAndCompeteSubsequence(t,idx+1,ns,beginc,i%2,checkcons &&(!((i%2 != leftreverse) && i<=(min(idx,2*t-idx))))) ;   
+		ClassfiyAndCompeteSubsequence(t,idx+1,ns,beginc,i%2 , checkcons &&(!((i%2 != leftreverse) && (i<=(min(idx,2*t-idx)))))) ;     //ps:  && i<=(min(idx,2*t-idx))  修改为  && (i<=(min(idx,2*t-idx)))    &&比<=的优先级高
 		if(i<=(min(idx,2*t-idx)) && nows=="01 01 01 ")
 		{
-			cout<<"same:"<<!((i%2 != leftreverse)) <<"  " << i%2<<"   "<< leftreverse <<"   "<< ns <<endl;
+			cout<<"[same]  left:"<< leftreverse  <<"    right:"<< i%2 <<"   "
+			<< "   "<<(i%2 != leftreverse) <<"   " << (i<=(min(idx,2*t-idx)))
+			<<"     "<<!((i%2 != leftreverse) && (i<=(min(idx,2*t-idx))))
+			<<"     . "<< ns <<endl;
 		}
 
 		/* 下一段第一个符号和本段相反 ,此时如果本段长度为偶数则为反转  101 01xxx    1010 01xxx*/
 		char barbaginc = (beginc=='0'?'1':'0');
 		ns = gen_next_string(nows,barbaginc,i);
-		ClassfiyAndCompeteSubsequence(t,idx+1,ns,barbaginc,(i-1)%2,checkcons &&(!(((i-1)%2 != leftreverse) && i<=(min(idx,2*t-idx)))));    
+		ClassfiyAndCompeteSubsequence(t,idx+1,ns,barbaginc,(i-1)%2, checkcons && !(((i-1)%2 != leftreverse) && (i<=(min(idx,2*t-idx)))) );    
 		if(i<=(min(idx,2*t-idx)) && nows=="01 01 01 ")
 		{
-			cout<<"diff:"<<!(((i-1)%2 != leftreverse)) <<"  " << (i-1)%2<<"   "<< leftreverse <<"   " << ns <<endl;
+			cout<<"[diff]  left:"<<leftreverse << "    right:" <<(i-1)%2 << "  " 
+			<< "   "<<((i-1)%2 != leftreverse) <<"   " << (i<=(min(idx,2*t-idx)))
+			<<"    "<<!(((i-1)%2 != leftreverse) && (i<=(min(idx,2*t-idx))))  
+			<<"     - " << ns <<endl;
 		}
-	
 	}
 }
 
