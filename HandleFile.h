@@ -87,7 +87,7 @@ void HandleCaseExpSucc(string s,int d,ofstream &myfile)
 /* 处理第一种情况 符合预期 不满足距离要求*/
 void HandleCaseExpFail(string s,int d,ofstream &myfile)
 {
-	myfile<< s+"  \"YES\" ["+to_string(d)+"]\n" ;
+	myfile<< s+"  \"No\" ["+to_string(d)+"]\n" ;
 	//cout<< s+"  \"NO\" ["+to_string(d)+"]\n" ;
 }
 /* 第三种情况，意外之喜 */
@@ -101,7 +101,7 @@ void HandleCaseUnExpSucc(string s,int d,ofstream &myfile)
 /* 第四种情况，不及预期 期望符合实际不符合*/
 void HandleCaseUnExpFail(string s,int d,ofstream &myfile)
 {
-	myfile<< s+"  \"NO\" ["+to_string(d)+"]\n" ;
+	myfile<< s+"  \"YES\" ["+to_string(d)+"]\n" ;
 	//cout<< s+"  \"NO\" []"+to_string(d)+"]\n" ;
 }
 
@@ -117,7 +117,7 @@ std::string gen_next_string(string &s,char c, int k) {
     return result+' ';
 } 
 
-void ClassfiyAndCompeteSubsequence(int t,int idx,string &nows,char beginc,bool leftreverse,bool checkcons)
+void ClassfiyAndCompeteSubsequence(int t,int idx,string nows,char beginc,bool leftreverse,bool checkcons)
 {
 	/* 已经把所有的段都赋值好了 根据序列计算出互补序列*/
 	if(idx == 2*t)
@@ -154,28 +154,30 @@ void ClassfiyAndCompeteSubsequence(int t,int idx,string &nows,char beginc,bool l
 		   原来满足+现在不完全翻转但长度大于等于要求 
 		
 		*/
+		string ns;   //新的字符串
+		char barbaginc = (beginc=='0'?'1':'0');   //本段开头字符相反的字符
+		bool rightreserved;     //右边是否翻转
+		bool newCheckCons;        //增加了该段之后判断是不是仍然满足要求的条件
+		
 	    /* 下一段第一个符号和本段第一个一样： 根据本段长度，可以判断右边是否反转 再结合左边翻转情况就知道是不是满足结构要求*/
-		string ns = gen_next_string(nows,beginc,i);
-		ClassfiyAndCompeteSubsequence(t,idx+1,ns,beginc,i%2 , checkcons &&(!((i%2 != leftreverse) && (i<=(min(idx,2*t-idx)))))) ;     //ps:  && i<=(min(idx,2*t-idx))  修改为  && (i<=(min(idx,2*t-idx)))    &&比<=的优先级高
-		if(i<=(min(idx,2*t-idx)) && nows=="01 01 01 ")
-		{
-			cout<<"[same]  left:"<< leftreverse  <<"    right:"<< i%2 <<"   "
-			<< "   "<<(i%2 != leftreverse) <<"   " << (i<=(min(idx,2*t-idx)))
-			<<"     "<<!((i%2 != leftreverse) && (i<=(min(idx,2*t-idx))))
-			<<"     . "<< ns <<endl;
-		}
+		ns = gen_next_string(nows,beginc,i);
+		rightreserved = i%2;
+		if(checkcons)
+			newCheckCons = (i > idx) || (leftreverse == rightreserved);
+		else
+			newCheckCons = false; 
+		ClassfiyAndCompeteSubsequence(t,idx+1,ns,beginc,rightreserved,newCheckCons) ;     //ps:  && i<=(min(idx,2*t-idx))  修改为  && (i<=(min(idx,2*t-idx)))    &&比<=的优先级高
+	
 
 		/* 下一段第一个符号和本段相反 ,此时如果本段长度为偶数则为反转  101 01xxx    1010 01xxx*/
-		char barbaginc = (beginc=='0'?'1':'0');
 		ns = gen_next_string(nows,barbaginc,i);
-		ClassfiyAndCompeteSubsequence(t,idx+1,ns,barbaginc,(i-1)%2, checkcons && !(((i-1)%2 != leftreverse) && (i<=(min(idx,2*t-idx)))) );    
-		if(i<=(min(idx,2*t-idx)) && nows=="01 01 01 ")
-		{
-			cout<<"[diff]  left:"<<leftreverse << "    right:" <<(i-1)%2 << "  " 
-			<< "   "<<((i-1)%2 != leftreverse) <<"   " << (i<=(min(idx,2*t-idx)))
-			<<"    "<<!(((i-1)%2 != leftreverse) && (i<=(min(idx,2*t-idx))))  
-			<<"     - " << ns <<endl;
-		}
+		rightreserved = (i-1)%2;
+		if(checkcons)
+			newCheckCons = (i > idx) || (leftreverse == rightreserved);
+		else
+			newCheckCons = false; 
+		ClassfiyAndCompeteSubsequence(t,idx+1,ns,barbaginc,rightreserved,newCheckCons) ;
+
 	}
 }
 
